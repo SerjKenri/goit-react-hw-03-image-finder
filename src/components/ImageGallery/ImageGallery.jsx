@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import propTypes from 'prop-types';
 import css from './ImageGallery.module.css';
-import Api from '../Api/Api.jsx'
+import { fetchImagesApi } from 'Api/Api';
 import { toast } from 'react-toastify';
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Loader } from 'components/Loader/Loader';
@@ -30,7 +30,9 @@ export class ImageGallery extends Component {
 
         if(prevRequest !== request) {
             this.setState({loader: true, page: 1, gallery: []});
-            this.fetchImages(request, page);
+            if(page === 1) {
+                this.fetchImages(request, page);
+            }
         }else if (prevPage !== page) {
             this.setState({loader: true});
             this.fetchImages(request, page);
@@ -41,7 +43,7 @@ export class ImageGallery extends Component {
             const {request} = this.props;
             const { page } = this.state;
             this.setState({loader: true});
-                Api(request, page)
+            fetchImagesApi(request, page)
                 .then(response => {
                     const {hits, totalHits} = response;
                     if(!hits.length) {
@@ -103,7 +105,7 @@ export class ImageGallery extends Component {
             ))}
             </ul>
             {loader && <Loader />}
-            {gallery.length < totalHits && <Button onClick={this.handleButtonClick}/>}
+            {!loader && gallery.length < totalHits && <Button onClick={this.handleButtonClick}/>}
         </>
         }
 }
